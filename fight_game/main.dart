@@ -1,3 +1,5 @@
+//Updated with Null Safety on 11/28/2021
+
 import "package:flutter/material.dart";
 import 'dart:async';
 
@@ -30,11 +32,11 @@ class Energy {
   int get value => _value;
   
   void increase(int amount) {
-    if (this._value < Energy.max) this._value += amount;
+    if (_value < Energy.max) _value += amount;
   }
   
   void decrease(int amount) {
-    if (this._value > 0) this._value -= amount;
+    if (_value > 0) _value -= amount;
   }
 }
 
@@ -48,8 +50,8 @@ class Player extends EventEmitter<GameEvent> {
   final energy = Energy();
   
   void setCharacter(GameCharacter value) {
-    this.character = value;
-    this.character!.isSelected = true;
+    character = value;
+    character!.isSelected = true;
     isReady = true;
   }
   
@@ -57,7 +59,7 @@ class Player extends EventEmitter<GameEvent> {
   
   void attack(Player player, Attack attack) {
     if (game == null) return;
-    this.game!.emit(
+    game!.emit(
       PlayerAttackedEvent(
         attacker: this, 
         attacked: player, 
@@ -100,7 +102,7 @@ class GameCharacter extends EventEmitter<GameEvent> {
 //Events
 
 class EventEmitter<T> {
-  StreamController<T> _streamController = StreamController<T>.broadcast();
+ final _streamController = StreamController<T>.broadcast();
   
   void dispose() {
     _streamController.sink.close();
@@ -246,7 +248,7 @@ class Game extends EventEmitter<GameEvent> {
   }
 
   void config() {
-    for (int i = 0; i < this.maxPlayers; i++) {
+    for (int i = 0; i < maxPlayers; i++) {
       final player = Player(id: i);
       player.addToGame(this);
       _players.add(player);
@@ -369,7 +371,7 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: Colors.black,
       body: Center(
        child: Padding(
-         padding: EdgeInsets.all(40.0),
+         padding: const EdgeInsets.all(40.0),
         child: Column(
          mainAxisAlignment: MainAxisAlignment.center,
          crossAxisAlignment: CrossAxisAlignment.center,
@@ -379,29 +381,29 @@ class HomeScreen extends StatelessWidget {
             children: <Widget> [
                
               ElevatedButton(
-          child: Text("Play"),
+          child: const Text("Play"),
          onPressed: () {
            Navigator.of(context).pushNamed("/mortal-kombat-1");
          }
        ),
-             Padding(
-                padding: EdgeInsets.only(left: 10.0),
-                child:  Text("Mortal Kombat 1")
+           const  Padding(
+                padding:  EdgeInsets.only(left: 10.0),
+                child:   Text("Mortal Kombat 1")
                 ) 
             ]
             ),
-          Divider(),
+         const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget> [
              
               ElevatedButton(
-          child: Text("Play"),
+          child: const Text("Play"),
          onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Not available yet.")));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Not available yet.")));
          }
        ),
-              Padding(
+              const Padding(
                 padding: EdgeInsets.only(left: 10.0),
                 child:  Text("The Legend Of Zelda: Ocarina of Time")
                 ), 
@@ -415,7 +417,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-final mainTextStyle = TextStyle(
+const mainTextStyle =  TextStyle(
   color: Colors.yellow,
   fontSize: 36,
 );
@@ -460,7 +462,7 @@ class _MortalKombatScreenState extends State<MortalKombatScreen> {
                  builder: ( context, event ) {
                   return Center(
         child: event is GameLoadingEvent
-      ? CircularProgressIndicator()
+      ? const CircularProgressIndicator()
       : event is GameRoundEvent
       ? GameRoundScene( event: event )
       : event is PlayerSelectedEvent
@@ -471,13 +473,13 @@ class _MortalKombatScreenState extends State<MortalKombatScreen> {
         ? SelectFighterScene( event: event )
         : event is CustomEvent
          ? Text( event.text )
-         : Text( "Unknown event." )
+         : const Text( "Unknown event." )
     );
                 }
               )
             : snapshot.hasError 
               ? Text(snapshot.error.toString())
-              : Center(child: CircularProgressIndicator());
+              : const Center(child: CircularProgressIndicator());
         }
       )
     );
@@ -491,30 +493,30 @@ class SceneBuilder extends StatelessWidget  {
   final GameEvent event;
 
   
-  SceneBuilder({required this.builder, required this.event});
+  const SceneBuilder({required this.builder, required this.event});
   
   @override
   Widget build(context) {
-    return this.builder(context, event);
+    return builder(context, event);
   }
 }
 
 class GameRoundScene extends Scene {
-   GameRoundScene({required event}) : super(event: event);
+   const GameRoundScene({required event}) : super(event: event);
   
   @override
   Widget build(context) {
     final Size size = MediaQuery.of(context).size;
-    return Container(
+    return  SizedBox(
          width: size.width,
       height: size.height,
-      child: Text( "ROUND ONE... FIGHT!" , style: mainTextStyle )
+      child:  const  Text( "ROUND ONE... FIGHT!" , style: mainTextStyle )
       );
   }
 }
 
 class TitleScene extends Scene {
-  TitleScene({required event}) : super(event: event);
+  const TitleScene({required event}) : super(event: event);
   
   @override
   Widget build(context) {
@@ -523,7 +525,7 @@ class TitleScene extends Scene {
          width: size.width,
       height: size.height,
       color: Colors.red[800],
-      child: Center(
+      child: const Center(
       child: Text("Mortal Kombat", style: mainTextStyle)
     )
     );
@@ -532,7 +534,7 @@ class TitleScene extends Scene {
 
 class SelectFighterScene extends Scene {
  
-  SelectFighterScene({required event}) : super(event: event);
+  const SelectFighterScene({required event}) : super(event: event);
   
   @override
   Widget build(context) {
@@ -546,7 +548,7 @@ class SelectFighterScene extends Scene {
        
         crossAxisAlignment: CrossAxisAlignment.center,
        children: <Widget> [
-         Text("Choose Your Fighter", style: mainTextStyle),
+         const Text("Choose Your Fighter", style: mainTextStyle),
          GridView.count(
            shrinkWrap: true,
           crossAxisCount: 6,
@@ -586,9 +588,8 @@ class SelectFighterScene extends Scene {
 abstract class Scene extends StatelessWidget  {
   final GameEvent event;
   
-  Scene({required this.event});
+  const Scene({required this.event});
 }
-
 
 
 
